@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Cadastro.css">
+    <title>Vitality</title>
+    <script>
+        function verificarCredenciais() {
+            // E-mail e senha predefinidos
+            const emailPredefinido = "exemplo@dominio.com";
+            const senhaPredefinida = "123456";
+
+            // Obtendo os valores do formulário
+            const email = document.getElementById("email").value;
+            const senha = document.getElementById("senha").value;
+
+            // Verificando se o e-mail e a senha correspondem aos valores predefinidos
+            if (email === emailPredefinido && senha === senhaPredefinida) {
+                alert("Login bem-sucedido!");
+            } else {
+                alert("E-mail ou senha incorretos!");
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <div class="conteudo_header">
+            <img src="./imagens/logo_vitality.jpg" class="logo">
+            <h1>Vitality</h1>
+        </div>
+        <a href="./login.html">
+            <button class="button_header">Login</button>
+
+        </a>
+    </header>
+    <main>
+        <aside>
+            <img src="./imagens/lutador.png" alt="">
+            <img src="./imagens/mago.png" alt="">
+            <img src="./imagens/ninja.png" alt="">
+            <img src="./imagens/monge.png" alt="">
+
+        </aside>
+        <article>
+            <h1>Cadastre-se</h1>
+            <form onsubmit="event.preventDefault(); verificarCredenciais();">
+                
+                <input  type="text" placeholder="Nome de Usuário" ><br><br>
+                
+                <input  type="text" placeholder="Email" required><br><br>
+
+                <input  type="password" placeholder="Senha" required><br><br>
+
+                <input  type="password" placeholder="Confirmar senha" required><br><br>
+                
+                <a href="./login.html">
+
+                    <button type="submit" class="button_register">Registre-se</button>
+                </a>
+            </form>
+        </article>
+    </main>
+</body>
+</html>

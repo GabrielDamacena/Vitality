@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status do Personagem e Missões</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-image: url('img/fundo/background.png');
+            background-size: cover; /* A imagem ocupará toda a tela sem zoom */
+            background-repeat: no-repeat;
+            background-position: center center;
+            font-family: Arial, sans-serif;
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .top-section {
+            display: flex;
+            gap: 20px;
+        }
+
+        .left-side {
+            flex: 1;
+        }
+
+        .right-side {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+        }
+
+        .character-status {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(0, 115, 62, 0.8), rgba(0, 161, 80, 0.8));
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            max-width: 100%;
+        }
+
+        .character-status img.character {
+            width: 96px;
+            height: 96px;
+            margin-right: 20px;
+            border-radius: 50%; /* Borda arredondada na imagem do personagem */
+            border: 3px solid #c8e6c9; /* Borda ao redor da imagem do personagem */
+            background-color: #00a150;
+            padding: 10px;
+        }
+
+        .character-info {
+            flex-grow: 1;
+        }
+
+        .character-info h2 {
+            margin: 0;
+            font-size: 1.5em; /* Fonte maior */
+            display: flex;
+            align-items: center;
+        }
+
+        .character-info h2 img {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+        }
+
+        .character-info p {
+            margin: 5px 0;
+            font-size: 1em; /* Fonte maior */
+            color: #c8e6c9;
+        }
+
+        .progress-bar {
+            height: 10px; /* Barra maior */
+            border-radius: 5px;
+            background-color: #004d26;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        .progress-bar span {
+            display: block;
+            height: 100%;
+            border-radius: 5px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .progress-bar.hp span {
+            width: 0%; /* Inicialmente vazia */
+            background-color: #e53935;
+        }
+
+        .progress-bar.xp span {
+            width: 0%; /* Inicialmente vazia */
+            background-color: #ffb300;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1em; /* Fonte maior */
+            color: #c8e6c9;
+        }
+
+        .stats span {
+            display: inline-block;
+        }
+
+        .money-status {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .money-status img {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+        }
+
+        .money-status span {
+            font-size: 1.2em; /* Fonte ajustada */
+            color: #ffc107;
+        }
+
+        /* Botões de escolha de classe */
+        .class-selection {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .class-selection button {
+            padding: 10px 15px;
+            border: none;
+            background: linear-gradient(135deg, rgba(0, 115, 62, 0.8), rgba(0, 161, 80, 0.8));
+            backdrop-filter: blur(5px);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .class-selection button:hover {
+            background-color: #00733e;
+            transform: scale(1.1);
+        }
+
+        .class-selection button:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00a150;
+        }
+
+        /* Inventário e Loja */
+        .inventory, .shop {
+            background: linear-gradient(135deg, rgba(0, 115, 62, 0.8), rgba(0, 161, 80, 0.8));
+            backdrop-filter: blur(5px);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            flex-grow: 1; /* Faz o inventário e a loja ocuparem mais espaço */
+        }
+
+        .inventory h3, .shop h3 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .item-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .item {
+            width: 64px;
+            height: 64px;
+            background-color: #00a150;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .item img {
+            width: 100%; /* Garante que a imagem ocupe todo o item */
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .item:hover {
+            transform: scale(1.1);
+        }
+
+        .item.equipped {
+            border: 3px solid #ffc107; /* Borda destacada para itens equipados */
+        }
+
+        /* Estilo do Kanban */
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .kanban-column {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(0, 115, 62, 0.8), rgba(0, 161, 80, 0.8));
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .kanban-column h2 {
+            text-align: center;
+            margin-top: 0;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .kanban-item {
+            background-color: #00a150;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: move;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .kanban-item.dragging {
+            opacity: 0.5;
+        }
+
+        .kanban-column.dragging-over {
+            background-color: #004d26;
+            border: 2px dashed #c8e6c9;
+        }
+
+        /* Estilo do diálogo */
+        #level-up-dialog, #mission-dialog, #purchase-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #00733e;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        #level-up-dialog img, #mission-dialog img, #purchase-dialog img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 15px;
+        }
+
+        #level-up-dialog button, #mission-dialog button, #purchase-dialog button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #00a150;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Estilo para o tooltip do item */
+        #item-tooltip {
+            display: none;
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            font-size: 0.9em;
+            max-width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #item-tooltip .tooltip-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        #item-tooltip .tooltip-stats {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        #choose-class-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #00733e;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        
+        #choose-class-dialog .class-options button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #00a150;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        #choose-class-dialog .class-options button:hover {
+            background-color: #00733e;
+        }
+        
+        .add-task-button {
+            padding: 10px 15px;
+            background-color: #00a150;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        
+        .add-task-button:hover {
+            background-color: #00733e;
+            transform: scale(1.05);
+        }
+        
+
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="top-section">
+            <div class="left-side">
+                <!-- Status do Personagem -->
+                <div class="character-status">
+                    <img src="img/personas/lutador_persona.jpeg" alt="Personagem" class="character" id="character-image">
+                    <div class="character-info">
+                        <h2><img src="img/classes/default.png" alt="Classe Ícone" id="class-icon"> Braga</h2>
+                        <p>@KyoBraga - Nível <span id="level">1</span> <span id="class-name">Lutador</span></p>
+                        <div class="progress-bar hp">
+                            <span id="hp-bar"></span>
+                        </div>
+                        <div class="stats">
+                            <span id="hp-value">50 / 50</span>
+                        </div>
+                        <div class="progress-bar xp">
+                            <span id="xp-bar"></span>
+                        </div>
+                        <div class="stats">
+                            <span id="xp-value">0 / 25</span>
+                        </div>
+                        <div class="money-status">
+                            <img src="img/status/money.png" alt="Dinheiro">
+                            <span id="money">100</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-side">
+                <!-- Inventário -->
+                <div class="inventory">
+                    <h3>Inventário</h3>
+                    <div class="item-list" id="inventory">
+                        <!-- Itens equipados aparecerão aqui -->
+                    </div>
+                </div>
+
+                <!-- Loja -->
+                <div class="shop">
+                    <h3>Loja</h3>
+                    <div class="item-list">
+                        <div class="item"
+                             onmouseover="showItemDetails(event, 'Espada Lendária', 'Uma espada poderosa com poder antigo.', '<strong>FOR:</strong> +10')"
+                             onmouseout="hideItemDetails()"
+                             onclick="buyItem('Espada Lendária', 50, 'img/itens/espada.png', '+10 Ataque')"
+                             data-price="50">
+                            <img src="img/itens/espada.png" alt="Espada Lendária">
+                        </div>
+                        <div class="item"
+                             onmouseover="showItemDetails(event, 'Escudo de Ferro', 'Um escudo resistente para proteção máxima.', '<strong>CON:</strong> +15')"
+                             onmouseout="hideItemDetails()"
+                             onclick="buyItem('Escudo de Ferro', 40, 'img/itens/escudo.png', '+15 Defesa')"
+                             data-price="40">
+                            <img src="img/itens/escudo.png" alt="Escudo de Ferro">
+                        </div>
+                        <div class="item"
+                             onmouseover="showItemDetails(event, 'Anel Mágico', 'Um anel encantado que aumenta o poder mágico.', '<strong>INT:</strong> +5')"
+                             onmouseout="hideItemDetails()"
+                             onclick="buyItem('Anel Mágico', 35, 'img/itens/anel.png', '+5 Magia')"
+                             data-price="35">
+                            <img src="img/itens/anel.png" alt="Anel Mágico">
+                        </div>
+                        <div class="item"
+                             onmouseover="showItemDetails(event, 'Elmo do Guerreiro', 'Um elmo que concede força extra ao guerreiro.', '<strong>FOR:</strong> +8')"
+                             onmouseout="hideItemDetails()"
+                             onclick="buyItem('Elmo do Guerreiro', 30, 'img/itens/elmo.png', '+8 Defesa')"
+                             data-price="30">
+                            <img src="img/itens/elmo.png" alt="Elmo do Guerreiro">
+                        </div>
+                        <div class="item"
+                             onmouseover="showItemDetails(event, 'Botas de Velocidade', 'Botas que aumentam a agilidade e velocidade.', '<strong>PER:</strong> +5')"
+                             onmouseout="hideItemDetails()"
+                             onclick="buyItem('Botas de Velocidade', 25, 'img/itens/botas.png', '+5 Velocidade')"
+                             data-price="25">
+                            <img src="img/itens/botas.png" alt="Botas de Velocidade">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Escolha de Classe -->
+        <div class="class-selection">
+            <button onclick="chooseClass('lutador')">Lutador</button>
+            <button onclick="chooseClass('mago')">Mago</button>
+            <button onclick="chooseClass('ninja')">Ninja</button>
+            <button onclick="chooseClass('monge')">Monge</button>
+        </div>
+
+        <!-- Kanban de Missões -->
+        <div class="kanban-board">
+            <div class="kanban-column" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h2>A Fazer</h2>
+                <div class="kanban-item" id="task1" draggable="true" ondragstart="drag(event)" data-xp="10" data-money="5">
+                    Reduzir Tempo de Tela (10 XP, 5 Moedas)
+                </div>
+                <div class="kanban-item" id="task2" draggable="true" ondragstart="drag(event)" data-xp="15" data-money="10">
+                    Pausa de 5 Minutos para Alongamento (15 XP, 10 Moedas)
+                </div>
+                <div class="kanban-item" id="task3" draggable="true" ondragstart="drag(event)" data-xp="5" data-money="3">
+                    Meditação de 10 Minutos (5 XP, 3 Moedas)
+                </div>
+                <div class="kanban-item" id="task4" draggable="true" ondragstart="drag(event)" data-xp="20" data-money="15">
+                    Caminhada de 30 Minutos (20 XP, 15 Moedas)
+                </div>
+                <div class="kanban-item" id="task5" draggable="true" ondragstart="drag(event)" data-xp="30" data-money="20">
+                    Exercício de Respiração Profunda (30 XP, 20 Moedas)
+                </div>
+                <div class="kanban-item" id="task6" draggable="true" ondragstart="drag(event)" data-xp="25" data-money="18">
+                    Leitura de 1 Capítulo de um Livro (25 XP, 18 Moedas)
+                </div>
+                <div class="kanban-item" id="task7" draggable="true" ondragstart="drag(event)" data-xp="20" data-money="12">
+                    Assistir a uma Palestra Motivacional (20 XP, 12 Moedas)
+                </div>
+                <div class="kanban-item" id="task8" draggable="true" ondragstart="drag(event)" data-xp="35" data-money="25">
+                    Planejamento de Metas Semanais (35 XP, 25 Moedas)
+                </div>
+                <div class="kanban-item" id="task9" draggable="true" ondragstart="drag(event)" data-xp="50" data-money="30">
+                    Revisão e Reflexão Pessoal (50 XP, 30 Moedas)
+                </div>
+                <div class="kanban-item" id="task10" draggable="true" ondragstart="drag(event)" data-xp="40" data-money="28">
+                    Atividade Física de 1 Hora (40 XP, 28 Moedas)
+                </div>
+            </div>
+
+            <div class="kanban-column" id="in-progress" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h2>Em Progresso</h2>
+            </div>
+
+            <div class="kanban-column" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h2>Concluído</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diálogo de Level Up -->
+    <div id="level-up-dialog">
+        <img src="img/upgrade/level-up.png" alt="Level Up">
+        <h2>Parabéns!</h2>
+        <p>Você subiu para o Nível <span id="dialog-level">2</span>!</p>
+        <button onclick="closeLevelUpDialog()">Ok</button>
+    </div>
+
+    <!-- Diálogo de Missão Iniciada -->
+    <div id="mission-dialog">
+        <img src="img/upgrade/missao.png" alt="Missão Iniciada">
+        <h2>Missão Iniciada!</h2>
+        <p>Você começou a missão: <span id="mission-name">Missão</span></p>
+        <button onclick="closeMissionDialog()">Ok</button>
+    </div>
+
+    <!-- Tooltip de Item -->
+    <div id="item-tooltip">
+        <div class="tooltip-header" id="tooltip-item-name"></div>
+        <div id="tooltip-item-description"></div>
+        <div class="tooltip-stats" id="tooltip-item-stats"></div>
+    </div>
+
+    <div class="button-container">
+        <button onclick="openCustomTaskDialog()" class="add-task-button">+ Adicionar Nova Tarefa</button>
+    </div>
+    
+
+    <!-- Outros elementos do corpo, como o container, colunas, etc. -->
+
+    <!-- Diálogo para criar nova missão personalizada -->
+    <div id="custom-task-dialog" style="display:none;">
+        <h2>Nova Tarefa Customizada</h2>
+        <label for="task-title">Título:</label>
+        <input type="text" id="task-title" placeholder="Título da Tarefa">
+    
+        <label for="task-xp">XP:</label>
+        <input type="number" id="task-xp" placeholder="XP">
+
+        <label for="task-money">Moedas:</label>
+        <input type="number" id="task-money" placeholder="Moedas">
+
+        <button onclick="addCustomTask()">Adicionar Tarefa</button>
+        <button onclick="closeCustomTaskDialog()">Cancelar</button>
+    </div>
+
+    <!-- Outros elementos do corpo, como diálogos, tooltips, etc. -->
+
+    <script src="script.js"></script>
+    </body>
+    </html>
+
